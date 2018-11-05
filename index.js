@@ -17,6 +17,7 @@ export default class ReadMore extends React.Component {
     }
 
     // Get the height of the text with no restriction on number of lines
+    console.log(this._text); // without it fullHeight is undefined on android
     const fullHeight = await measureHeightAsync(this._text);
     this.setState({ measured: true });
     await nextFrameAsync();
@@ -51,7 +52,9 @@ export default class ReadMore extends React.Component {
         <Text
           numberOfLines={measured && !showAllText ? numberOfLines : 0}
           ref={text => {
-            this._text = text;
+            if (typeof text !== 'undefined' && text !== null) {
+              this._text = text;
+            }
           }}
         >
           {this.props.children}
@@ -72,12 +75,10 @@ export default class ReadMore extends React.Component {
 
   _maybeRenderReadMore() {
     let { shouldShowReadMore, showAllText } = this.state;
-
     if (shouldShowReadMore && !showAllText) {
       if (this.props.renderTruncatedFooter) {
         return this.props.renderTruncatedFooter(this._handlePressReadMore);
       }
-
       return (
         <Text style={styles.button} onPress={this._handlePressReadMore}>
           Read more
